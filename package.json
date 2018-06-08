@@ -1,0 +1,56 @@
+{
+    "name": "aws-cli-configure",
+    "displayName": "AWS CLI Configure",
+    "description": "Quickly access the AWS CLI config and credentials files",
+    "version": "0.0.1",
+    "publisher": "mark-tucker",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "icon": "images/icon.png",
+    "engines": {
+        "vscode": "^1.24.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.openCredentialsFile",
+        "onCommand:extension.openConfigFile",
+        "onCommand:extension.openBothFiles",
+        "onCommand:extension.openOnlineDocs"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.openCredentialsFile",
+                "title": "AWS CLI: Open credentials file"
+            },
+            {
+                "command": "extension.openConfigFile",
+                "title": "AWS CLI: Open config file"
+            },
+            {
+                "command": "extension.openBothFiles",
+                "title": "AWS CLI: Open credentials & config files"
+            },
+            {
+                "command": "extension.openOnlineDocs",
+                "title": "AWS CLI: Open online docs"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "eslint": "^4.11.0",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "opn": "^5.3.0"
+    }
+}
