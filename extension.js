@@ -48,10 +48,10 @@ function openOnlineDocs() {
 
 function activate(context) {
 
-    context.subscriptions.push(vscode.commands.registerCommand('extension.openCredentialsFile', openCredentialsFile));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.openConfigFile', openConfigFile));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.openBothFiles', openBothFiles));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.openOnlineDocs', openOnlineDocs));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.credentials', openCredentialsFile));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.config', openConfigFile));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.both', openBothFiles));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.browse.docs', openOnlineDocs));
 
 };
 

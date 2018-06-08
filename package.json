@@ -7,35 +7,54 @@
     "license": "SEE LICENSE IN LICENSE.md",
     "icon": "images/icon.png",
     "engines": {
-        "vscode": "^1.24.0"
+        "vscode": "^1.23.0"
+    },
+    "galleryBanner": {
+        "color": "#2B2C33",
+        "theme": "dark"
     },
     "categories": [
         "Other"
     ],
+    "keywords": [
+        "aws",
+        "amazon",
+        "aws cli",
+        "configure",
+        "config",
+        "credentials"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rmtuckerphx/aws-cli-configure.git"
+    },
+    "bugs": {
+        "url": "https://github.com/rmtuckerphx/aws-cli-configure/issues"
+    },
     "activationEvents": [
-        "onCommand:extension.openCredentialsFile",
-        "onCommand:extension.openConfigFile",
-        "onCommand:extension.openBothFiles",
-        "onCommand:extension.openOnlineDocs"
+        "onCommand:aws-cli.open.credentials",
+        "onCommand:aws-cli.open.config",
+        "onCommand:aws-cli.open.both",
+        "onCommand:aws-cli.browse.docs"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.openCredentialsFile",
+                "command": "aws-cli.open.credentials",
                 "title": "AWS CLI: Open credentials file"
             },
             {
-                "command": "extension.openConfigFile",
+                "command": "aws-cli.open.config",
                 "title": "AWS CLI: Open config file"
             },
             {
-                "command": "extension.openBothFiles",
+                "command": "aws-cli.open.both",
                 "title": "AWS CLI: Open credentials & config files"
             },
             {
-                "command": "extension.openOnlineDocs",
-                "title": "AWS CLI: Open online docs"
+                "command": "aws-cli.browse.docs",
+                "title": "AWS CLI: Browse online docs"
             }
         ]
     },
