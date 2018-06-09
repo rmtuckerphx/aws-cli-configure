@@ -46,10 +46,24 @@ function openOnlineDocs() {
 
 }
 
-function listProfilesCredentials() {
-    const profiles = getSortedProfilesCredentials(false);
+function showDefaultProfileMapCredentials() {
 
-    let message = `Here are the profiles: ${profiles.join(', ')}`;
+    const mappedProfile = getDefaultProfileSetTo();
+    let message = '';
+
+    switch (mappedProfile) {
+        case '<none>':
+            message = `No [default] profile in 'credentials'`;
+            break;
+
+        case 'default':
+            message = `No [named] profile mapped to [default] in 'credentials'`;
+            break;
+    
+        default:
+            message = `The [${mappedProfile}] profile is mapped to [default] in 'credentials'`
+            break;
+    }
 
     vscode.window.showInformationMessage(message);
 }
@@ -91,9 +105,9 @@ function getSortedProfilesCredentials(includeDefaultProfile = true) {
 }
 
 function updateStatus(status) {
-    let text = getDefaultProfileSetTo();
+    const text = getDefaultProfileSetTo();
     if (text) {
-        status.text = 'AWS CLI: ' + text;
+        status.text = '$(terminal) AWS CLI: ' + text;
     }
 
     if (text) {
@@ -147,6 +161,23 @@ function getDefaultProfileSetTo() {
 
 }
 
+async function setDefaultProfileToCredentials() {
+    
+    const profiles = getSortedProfilesCredentials(false);
+    const newProfile = await vscode.window.showQuickPick(profiles, { placeHolder: `Select the [named] profile to set as the [default] profile in the 'credentials' file.` });
+
+    if (newProfile) {
+        vscode.window.showInformationMessage(`[default] profile in 'credentials' file set to: '${newProfile}'.`);
+    }
+
+    // const target = await vscode.window.showQuickPick(
+    //     [
+    //         { label: 'User', description: 'User Settings', target: vscode.ConfigurationTarget.Global },
+    //         { label: 'Workspace', description: 'Workspace Settings', target: vscode.ConfigurationTarget.Workspace }
+    //     ],
+    //     { placeHolder: 'Select the view to show when opening a window.' });
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -157,10 +188,14 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.both', openBothFiles));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.browse.docs', openOnlineDocs));
 
-    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.list-profiles.credentials', listProfilesCredentials));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.default.map.credentials', showDefaultProfileMapCredentials));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.set-default-profile.credentials', setDefaultProfileToCredentials));
 
-    const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    // status.command = 'extension.selectedLines';
+    const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+    status.command = 'aws-cli.set-default-profile.credentials';
+    status.tooltip = `Set [default] profile in 'credentials' to [named] profile`;
+    // status.color = '#000000';
+    
     context.subscriptions.push(status);
 
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((doc) => {

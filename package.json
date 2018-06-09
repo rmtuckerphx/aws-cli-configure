@@ -35,30 +35,35 @@
         "onCommand:aws-cli.open.config",
         "onCommand:aws-cli.open.both",
         "onCommand:aws-cli.browse.docs",
-        "onCommand:aws-cli.list-profiles.credentials"
+        "onCommand:aws-cli.default.map.credentials",
+        "onCommand:aws-cli.set-default-profile.credentials"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
                 "command": "aws-cli.open.credentials",
-                "title": "AWS CLI: Open credentials file"
+                "title": "AWS CLI: Open 'credentials' file"
             },
             {
                 "command": "aws-cli.open.config",
-                "title": "AWS CLI: Open config file"
+                "title": "AWS CLI: Open 'config' file"
             },
             {
                 "command": "aws-cli.open.both",
-                "title": "AWS CLI: Open credentials & config files"
+                "title": "AWS CLI: Open 'credentials' & 'config' files"
             },
             {
                 "command": "aws-cli.browse.docs",
                 "title": "AWS CLI: Browse online docs"
             },
             {
-                "command": "aws-cli.list-profiles.credentials",
-                "title": "AWS CLI: List credentials profiles"
+                "command": "aws-cli.default.map.credentials",
+                "title": "AWS CLI: Show [named] profile mapped to [default] in 'credentials'"
+            },
+            {
+                "command": "aws-cli.set-default-profile.credentials",
+                "title": "AWS CLI: Set 'credentials' [default] profile to..."
             }
         ]
     },

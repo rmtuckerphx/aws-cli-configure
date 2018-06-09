@@ -13,7 +13,7 @@ The extension adds commands for the following:
 
 For example if there is an image subfolder under your extension project workspace:
 
-\!\[feature commands\]\(images/commands.png)
+\!\[feature commands\]\(./images/commands.png)
 
 
 
