@@ -8,6 +8,7 @@ const fs = require('fs');
 const profileHandler = require('aws-profile-handler');
 const hash = require('object-hash');
 const copyPaste = require("copy-paste");
+const uniqid = require('uniqid');
 
 const DEFAULT_PROFILE = 'default';
 
@@ -57,10 +58,10 @@ function getTooltipMessage() {
             message = `No [default] profile in 'credentials'`;
             break;
 
-        case 'default':
+        case DEFAULT_PROFILE:
             message = `No [named] profile mapped to [default] in 'credentials'`;
             break;
-    
+
         default:
             message = `The [${mappedProfile}] profile is mapped to [default] in 'credentials'`
             break;
@@ -170,15 +171,47 @@ function getDefaultProfileSetTo() {
 
 }
 
-async function setDefaultProfileToCredentials() {
-    
+async function setDefaultProfileToCredentials(status) {
+
     const profiles = getSortedProfilesCredentials(false);
     const newProfile = await vscode.window.showQuickPick(profiles, { placeHolder: `Select the [named] profile to set as the [default] profile in the 'credentials' file.` });
 
     if (newProfile) {
+
         const message = `[default] profile in 'credentials' file set to: '${newProfile}'.`;
         console.log(message);
-        // vscode.window.showInformationMessage(message);
+
+        const newProfileData = profileHandler.getProfileCredentials(newProfile);
+
+        const mappedProfile = getDefaultProfileSetTo();
+        
+
+        if (mappedProfile === '<none>') {
+            //add new [default] profile using values from mappedProfile       
+            profileHandler.addProfile(DEFAULT_PROFILE, newProfileData);
+        }
+        else {
+            const defaultProfileData = profileHandler.getProfileCredentials(DEFAULT_PROFILE);
+
+            if (mappedProfile === DEFAULT_PROFILE) {
+                //add new profile zzz-default-?
+                const generatedName = uniqid('zzz-default-');
+
+                profileHandler.addProfile(generatedName, defaultProfileData);
+
+                const message = `The [default] profile was renamed to ${generatedName}. Rename or delete this profile.`;
+                vscode.window.showInformationMessage(message);
+            }
+
+            //delete default profile
+            profileHandler.deleteProfile(DEFAULT_PROFILE);
+
+            //add new [default] profile using values from mappedProfile
+            profileHandler.addProfile(DEFAULT_PROFILE, newProfileData);
+
+        }
+
+        updateStatus(status);
     }
 
 }
@@ -190,9 +223,8 @@ async function copyProfileNameCredentials() {
 
     if (selectedProfile) {
         copyPaste.copy(selectedProfile, () => {
-            //vscode.window.showInformationMessage(`'${selectedProfile}' copied to clipboard.`);
             vscode.window.setStatusBarMessage(`'${selectedProfile}' copied to clipboard.`, 10000);
-        });        
+        });
     }
 
 }
@@ -202,21 +234,22 @@ async function copyProfileNameCredentials() {
 
 function activate(context) {
 
+    const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+    status.command = 'aws-cli.set-default-profile.credentials';
+    // status.tooltip = `Set [default] profile in 'credentials' to [named] profile`;
+    status.tooltip = getTooltipMessage();
+    context.subscriptions.push(status);
+
+
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.credentials', openCredentialsFile));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.config', openConfigFile));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.both', openBothFiles));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.browse.docs', openOnlineDocs));
 
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.default.map.credentials', showDefaultProfileMapCredentials));
-    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.set-default-profile.credentials', setDefaultProfileToCredentials));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.set-default-profile.credentials', setDefaultProfileToCredentials(status)));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.copy.profile.credentials', copyProfileNameCredentials));
 
-    const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    status.command = 'aws-cli.set-default-profile.credentials';
-    // status.tooltip = `Set [default] profile in 'credentials' to [named] profile`;
-    status.tooltip = getTooltipMessage();
-
-    context.subscriptions.push(status);
 
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((doc) => {
         const credentialsFile = path.join(os.homedir(), '.aws', 'credentials').toLowerCase();

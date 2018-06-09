@@ -1,14 +1,26 @@
 # Change Log
-All notable changes to the "aws-cli-configure" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+All notable changes to the AWS CLI Configure extension will be documented in this file.
 
 ## [Unreleased]
-- TBD
+- Allow copying profiles with keys (role_arn & source_profile) in addition to those with keys (aws_access_key_id & aws_secret_access_key)
 
-## [0.0.1] - 2018-06-08
+## 0.2.0 - (2018-06-09)
 ### Added
-- Command: Open `credentials` file
-- Command: Open `config` file
-- Command: Open `credentials` & `config` files
+- Command: Show [named] profile mapped to [default] in 'credentials'
+- Command: Set 'credentials' [default] profile to...
+- Command: Copy profile name from 'credentials'...
+- Status Bar: Activating extension shows which [named] profile is mapped to [default]
+- Status Bar: Clicking profile name in status bar executes command: Set 'credentials' [default] profile to...
+
+### Updated
+- Rename command to: Open 'credentials' file
+- Rename command to: Open 'config' file
+- Rename command to: Open 'credentials' & 'config' files
+
+
+## 0.0.1 - (2018-06-08)
+### Added
+- Command: Open credentials file
+- Command: Open config file
+- Command: Open credentials & config files
 - Command: Browse online docs
