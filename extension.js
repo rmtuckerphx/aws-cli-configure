@@ -7,6 +7,7 @@ const opn = require('opn');
 const fs = require('fs');
 const profileHandler = require('aws-profile-handler');
 const hash = require('object-hash');
+const copyPaste = require("copy-paste");
 
 const DEFAULT_PROFILE = 'default';
 
@@ -46,7 +47,7 @@ function openOnlineDocs() {
 
 }
 
-function showDefaultProfileMapCredentials() {
+function getTooltipMessage() {
 
     const mappedProfile = getDefaultProfileSetTo();
     let message = '';
@@ -65,7 +66,15 @@ function showDefaultProfileMapCredentials() {
             break;
     }
 
-    vscode.window.showInformationMessage(message);
+    return message;
+}
+
+function showDefaultProfileMapCredentials() {
+
+    const message = getTooltipMessage();
+    vscode.window.setStatusBarMessage(message, 10000);
+    // vscode.window.showInformationMessage(message);
+
 }
 
 function getSortedProfilesCredentials(includeDefaultProfile = true) {
@@ -167,15 +176,25 @@ async function setDefaultProfileToCredentials() {
     const newProfile = await vscode.window.showQuickPick(profiles, { placeHolder: `Select the [named] profile to set as the [default] profile in the 'credentials' file.` });
 
     if (newProfile) {
-        vscode.window.showInformationMessage(`[default] profile in 'credentials' file set to: '${newProfile}'.`);
+        const message = `[default] profile in 'credentials' file set to: '${newProfile}'.`;
+        console.log(message);
+        // vscode.window.showInformationMessage(message);
     }
 
-    // const target = await vscode.window.showQuickPick(
-    //     [
-    //         { label: 'User', description: 'User Settings', target: vscode.ConfigurationTarget.Global },
-    //         { label: 'Workspace', description: 'Workspace Settings', target: vscode.ConfigurationTarget.Workspace }
-    //     ],
-    //     { placeHolder: 'Select the view to show when opening a window.' });
+}
+
+async function copyProfileNameCredentials() {
+
+    const profiles = getSortedProfilesCredentials(true);
+    const selectedProfile = await vscode.window.showQuickPick(profiles, { placeHolder: `Select profile name.` });
+
+    if (selectedProfile) {
+        copyPaste.copy(selectedProfile, () => {
+            //vscode.window.showInformationMessage(`'${selectedProfile}' copied to clipboard.`);
+            vscode.window.setStatusBarMessage(`'${selectedProfile}' copied to clipboard.`, 10000);
+        });        
+    }
+
 }
 
 // this method is called when your extension is activated
@@ -190,18 +209,20 @@ function activate(context) {
 
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.default.map.credentials', showDefaultProfileMapCredentials));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.set-default-profile.credentials', setDefaultProfileToCredentials));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.copy.profile.credentials', copyProfileNameCredentials));
 
     const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     status.command = 'aws-cli.set-default-profile.credentials';
-    status.tooltip = `Set [default] profile in 'credentials' to [named] profile`;
-    // status.color = '#000000';
-    
+    // status.tooltip = `Set [default] profile in 'credentials' to [named] profile`;
+    status.tooltip = getTooltipMessage();
+
     context.subscriptions.push(status);
 
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((doc) => {
         const credentialsFile = path.join(os.homedir(), '.aws', 'credentials').toLowerCase();
 
         if (doc.fileName.toLowerCase() === credentialsFile) {
+            status.tooltip = getTooltipMessage();
             updateStatus(status);
         }
     }));
