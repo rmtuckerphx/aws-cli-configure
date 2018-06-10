@@ -11,6 +11,7 @@ const copyPaste = require("copy-paste");
 const uniqid = require('uniqid');
 
 const DEFAULT_PROFILE = 'default';
+let statusBar;
 
 function openCredentialsFile(previewFlag = true) {
 
@@ -72,9 +73,7 @@ function getTooltipMessage() {
 
 function showDefaultProfileMapCredentials() {
 
-    const message = getTooltipMessage();
-    vscode.window.setStatusBarMessage(message, 10000);
-    // vscode.window.showInformationMessage(message);
+    updateStatus(statusBar);
 
 }
 
@@ -114,16 +113,21 @@ function getSortedProfilesCredentials(includeDefaultProfile = true) {
     return result;
 }
 
-function updateStatus(status) {
-    const text = getDefaultProfileSetTo();
-    if (text) {
-        status.text = '$(terminal) AWS CLI: ' + text;
-    }
+function updateStatus(statusBar) {
 
-    if (text) {
-        status.show();
-    } else {
-        status.hide();
+    if (statusBar) {
+
+        const text = getDefaultProfileSetTo();
+        if (text) {
+            statusBar.text = '$(terminal) AWS CLI: ' + text;
+            statusBar.tooltip = getTooltipMessage();
+        }
+
+        if (text) {
+            statusBar.show();
+        } else {
+            statusBar.hide();
+        }
     }
 }
 
@@ -171,7 +175,8 @@ function getDefaultProfileSetTo() {
 
 }
 
-async function setDefaultProfileToCredentials(status) {
+// async function setDefaultProfileToCredentials(statusBar) {
+async function setDefaultProfileToCredentials() {
 
     const profiles = getSortedProfilesCredentials(false);
     const newProfile = await vscode.window.showQuickPick(profiles, { placeHolder: `Select the [named] profile to set as the [default] profile in the 'credentials' file.` });
@@ -184,7 +189,7 @@ async function setDefaultProfileToCredentials(status) {
         const newProfileData = profileHandler.getProfileCredentials(newProfile);
 
         const mappedProfile = getDefaultProfileSetTo();
-        
+
 
         if (mappedProfile === '<none>') {
             //add new [default] profile using values from mappedProfile       
@@ -211,7 +216,7 @@ async function setDefaultProfileToCredentials(status) {
 
         }
 
-        updateStatus(status);
+        updateStatus(statusBar);
     }
 
 }
@@ -234,12 +239,10 @@ async function copyProfileNameCredentials() {
 
 function activate(context) {
 
-    const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    status.command = 'aws-cli.set-default-profile.credentials';
-    // status.tooltip = `Set [default] profile in 'credentials' to [named] profile`;
-    status.tooltip = getTooltipMessage();
-    context.subscriptions.push(status);
-
+    statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+    statusBar.command = 'aws-cli.set-default-profile.credentials';
+    context.subscriptions.push(statusBar);
+    updateStatus(statusBar);
 
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.credentials', openCredentialsFile));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.open.config', openConfigFile));
@@ -247,7 +250,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.browse.docs', openOnlineDocs));
 
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.default.map.credentials', showDefaultProfileMapCredentials));
-    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.set-default-profile.credentials', setDefaultProfileToCredentials(status)));
+    context.subscriptions.push(vscode.commands.registerCommand('aws-cli.set-default-profile.credentials', setDefaultProfileToCredentials));
     context.subscriptions.push(vscode.commands.registerCommand('aws-cli.copy.profile.credentials', copyProfileNameCredentials));
 
 
@@ -255,12 +258,9 @@ function activate(context) {
         const credentialsFile = path.join(os.homedir(), '.aws', 'credentials').toLowerCase();
 
         if (doc.fileName.toLowerCase() === credentialsFile) {
-            status.tooltip = getTooltipMessage();
-            updateStatus(status);
+            updateStatus(statusBar);
         }
     }));
-
-    updateStatus(status);
 
 };
 

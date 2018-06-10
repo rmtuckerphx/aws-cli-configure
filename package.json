@@ -2,7 +2,7 @@
     "name": "aws-cli-configure",
     "displayName": "AWS CLI Configure",
     "description": "Quickly access the AWS CLI config and credentials files",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "publisher": "mark-tucker",
     "license": "SEE LICENSE IN LICENSE.md",
     "icon": "images/icon.png",
