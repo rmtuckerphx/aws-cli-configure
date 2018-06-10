@@ -4,6 +4,10 @@ All notable changes to the AWS CLI Configure extension will be documented in thi
 ## [Unreleased]
 - Allow copying profiles with keys (role_arn & source_profile) in addition to those with keys (aws_access_key_id & aws_secret_access_key)
 
+## 0.2.1 - (2018-06-09)
+### Fixed
+- Fixed error when setting default profile to a named profile
+
 ## 0.2.0 - (2018-06-09)
 ### Added
 - Command: Show [named] profile mapped to [default] in 'credentials'
