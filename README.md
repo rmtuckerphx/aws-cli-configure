@@ -31,7 +31,23 @@ Now the name is on the clipboard. Paste away!
 
 ### Set default profile
 ![Set Default Profile](images/set-default-profile.png)
+To be able to set the [default] profile to a named profile, in the 'credentials' file each profile section must contain only two entries following one of these formats:
 
+- aws_access_key_id & aws_secret_access_key
+- role_arn & source_profile
+
+This sample shows the `master-profile` in one account that uses an access key and secret and three role profiles each in a seperate account that references the `master-profile` as the source profile.
+
+The [default] profile is set to `qa-profile`.
+
+![Sample Credentials File with Supported Sections](images/section-schema.png)
+
+Put `region` and other entries in the `config` file.
+If a section in `credentials` includes more than the required two entries and you try to set the default profile to it, you will get the following error:
+
+![Invalid schema error](images/invalid-schema-error.png)
+
+ 
 ## Known Issues
 
 No known issues
